@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         BC+ (Dev)
+// @name         BC+
 // @version      0.1
 // @description  Bloß eine schwache Imitation des ursprünglichen BC+
 // @author       Frechdachs
