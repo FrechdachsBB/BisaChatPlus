@@ -12,7 +12,7 @@
 const chatUL = document.getElementsByClassName("scrollContainer")[0].childNodes[1];
 const observerConfig = {childList:true};
 
-let highlightList = ["Frechdachs","test"];
+let highlightList = ["Frechdachs","test", "john"];
 
 const callback = (mutationList, observer) => {
 
