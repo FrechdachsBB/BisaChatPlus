@@ -1,7 +1,7 @@
 const chatUL = document.getElementsByClassName("scrollContainer")[0].childNodes[1];
 const observerConfig = {childList:true};
 
-let highlightList = ["Frechdachs","test", "john"];
+let highlightList = ["Frechdachs"];
 
 const callback = (mutationList, observer) => {
 
@@ -16,10 +16,11 @@ const callback = (mutationList, observer) => {
             return msg.toLowerCase().includes(h.toLowerCase());
         });
         console.log(foundTriggers);
-        if(foundTriggers.length>0){
-            chatMessageNode.style.background = "yellow";
+        if(foundTriggers.length===0)continue;
+        chatMessageNode.style.background = "yellow";
 
-        }
+
+
     }
 
 
