@@ -9,7 +9,7 @@ const script = async function() {
     let settingsNode = undefined;
 
 
-    const audio = new Audio("https://github.com/FrechdachsBB/BisaChatPlus/raw/dev/Ruf_001.mp3");
+    const audio = new Audio("https://github.com/FrechdachsBB/BisaChatPlus/raw/main/Ruf_001.mp3");
     const li = document.createElement("li");
 
     const analyzeChatMessages = (mutationList, observer) => {
