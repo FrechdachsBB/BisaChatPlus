@@ -19,7 +19,7 @@ const callback = (mutationList, observer) => {
         });
         console.log(foundTriggers);
         if(foundTriggers.length===0)continue;
-        chatMessageNode.style.background = "yellow";
+        chatMessageNode.style.background = "red";
         audio.play();
 
     }
