@@ -19,11 +19,9 @@ const script = async function() {
 
         for (let chatMessageNode of newNodes) {
             const msg = chatMessageNode.innerText;
-            console.log(msg);
             chatMessageNode.setAttribute("bcp-observed", true);
 
             const foundTriggers = higlightListArr.filter(h => msg.toLowerCase().includes(h.toLowerCase().trim()));
-            console.log(foundTriggers);
             if (foundTriggers.length === 0) continue;
             chatMessageNode.style.background = highlightColor;
             if (playSound && document.hidden) audio.play();
