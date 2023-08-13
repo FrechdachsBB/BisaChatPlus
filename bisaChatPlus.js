@@ -3,6 +3,8 @@ const observerConfig = {childList:true};
 
 let highlightList = ["Frechdachs"];
 
+const audio = new Audio("https://github.com/FrechdachsBB/BisaChatPlus/raw/dev/Ruf_001.mp3");
+
 const callback = (mutationList, observer) => {
 
     const newNodes = Array.from(chatUL.getElementsByClassName("chatMessage htmlContent")).filter(n => !n.hasAttribute("bcp-observed"));
@@ -18,8 +20,7 @@ const callback = (mutationList, observer) => {
         console.log(foundTriggers);
         if(foundTriggers.length===0)continue;
         chatMessageNode.style.background = "yellow";
-
-
+        audio.play();
 
     }
 
