@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         BC+
-// @version      0.3
+// @version      0.3.1
 // @description  Bloß eine schwache Imitation des ursprünglichen BC+
 // @author       Frechdachs
 // @match        https://community.bisafans.de/chat/index.php?room/*
@@ -27,18 +27,22 @@ const script = async function() {
     let highlightColor = await GM.getValue("bcplus_highlightColor", "#ffffaa");
     let settingsVisible = false;
     let settingsNode = undefined;
+    let checkedMessages = 0;
+
 
     const audio = new Audio("https://github.com/FrechdachsBB/BisaChatPlus/raw/main/bing.wav");
     const li = document.createElement("li");
 
     const analyzeChatMessages = (mutationList, observer) => {
         if (triggerList.length === 0) return;
-        const newNodes = Array.from(chatUL.getElementsByClassName("chatMessage htmlContent")).filter(n => !n.hasAttribute("bcp-observed"));
+        const newNodes = Array.from(chatUL.getElementsByClassName("chatMessage htmlContent"));
         const triggerListArr = triggerList.split(",")
 
-        for (let chatMessageNode of newNodes) {
+
+        while (checkedMessages<newNodes.length) {
+            const chatMessageNode = newNodes[checkedMessages];
+            checkedMessages++;
             const msg = chatMessageNode.innerText;
-            chatMessageNode.setAttribute("bcp-observed", true);
 
             const chatMessageContainer = chatMessageNode.parentElement.parentElement.parentElement;
             if(chatMessageContainer.getAttribute("data-user-id")==userID)continue;
