@@ -2,7 +2,7 @@ const script = async function() {
     const chatUL = document.getElementsByClassName("scrollContainer")[0].childNodes[1];
     const observerConfig = {childList: true};
 
-    let trigger = await GM.getValue("bcplus_trigger", "");
+    let triggerList = await GM.getValue("bcplus_trigger", "");
     let playSound = await GM.getValue("bcplus_playSound", true);
     let highlightColor = await GM.getValue("bcplus_highlightColor", "#ffff00");
     let settingsVisible = false;
@@ -13,15 +13,17 @@ const script = async function() {
     const li = document.createElement("li");
 
     const analyzeChatMessages = (mutationList, observer) => {
-        if (trigger.length === 0) return;
+        if (triggerList.length === 0) return;
         const newNodes = Array.from(chatUL.getElementsByClassName("chatMessage htmlContent")).filter(n => !n.hasAttribute("bcp-observed"));
-        const higlightListArr = trigger.split(",")
+        const triggerListArr = triggerList.split(",")
 
         for (let chatMessageNode of newNodes) {
             const msg = chatMessageNode.innerText;
             chatMessageNode.setAttribute("bcp-observed", true);
 
-            const foundTriggers = higlightListArr.filter(h => msg.toLowerCase().includes(h.toLowerCase().trim()));
+            const foundTriggers = triggerListArr.filter(trigger => {
+                return msg.toLowerCase().match("(^| )"+trigger+"( |\\.|$)").length>0;
+            });
             if (foundTriggers.length === 0) continue;
             chatMessageNode.style.background = highlightColor;
             if (playSound && document.hidden) audio.play();
@@ -60,7 +62,7 @@ const script = async function() {
             settingsNode.style.margin = "5px";
 
             settingsNode.appendChild(createLabelNode("Trigger:"));
-            settingsNode.appendChild(createInputNode(trigger,"text", callBackTrigger));
+            settingsNode.appendChild(createInputNode(triggerList,"text", callBackTrigger));
             settingsNode.appendChild(createLabelNode("Highlight-Farbe:"));
             settingsNode.appendChild(createInputNode(highlightColor,"text", callBackHighlightColor));
             settingsNode.appendChild(createLabelNode("Sound:"));
@@ -86,17 +88,19 @@ const script = async function() {
     }
 
     function callBackTrigger(node) {
-        GM.setValue("bcplus_trigger", node.value);
-        trigger = node.value;
+        setTriggerList(node.value)
     }
 
     function callBackHighlightColor(node) {
         const val = node.value;
         if (!val.match("^#(?:[0-9a-fA-F]{3}){1,2}$")) {
             node.style.background = "#ffe0e0";
+            node.style.color = "darkred";
             return;
         }
-        node.style.background = "unset";
+        node.style.removeProperty("background");
+        node.style.removeProperty("color");
+
         GM.setValue("bcplus_highlightColor", val);
         highlightColor = val;
     }
@@ -116,6 +120,11 @@ const script = async function() {
             ()=>callback(input)
         );
         return input;
+    }
+
+    function setTriggerList(triggers, update=true){
+        if(update)GM.setValue("bcplus_trigger", triggers);
+        triggerList = triggers.replace(/[#-.]|[[-^]|[?|{}]/g, '\\$&');
     }
 
     const observer = new MutationObserver(analyzeChatMessages);
