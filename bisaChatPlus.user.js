@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         BC+ (DEV)
+// @name         BC+
 // @version      0.2
 // @description  Bloß eine schwache Imitation des ursprünglichen BC+
 // @author       Frechdachs
@@ -10,8 +10,6 @@
 // ==/UserScript==
 
 const script = async function() {
-    console.log("Version 0.2!");
-
     const chatUL = document.getElementsByClassName("scrollContainer")[0].childNodes[1];
     const observerConfig = {childList: true};
 
@@ -53,7 +51,7 @@ const script = async function() {
         const a = document.createElement("a");
 
         a.setAttribute("class", "button");
-        a.innerText = "BisaChat +";
+        a.innerText = "BC+";
         a.addEventListener('click', toggleSettingsDisplay)
         li.appendChild(a);
         navBar.appendChild(li);
