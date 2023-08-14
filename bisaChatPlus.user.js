@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         BC+
-// @version      0.2
+// @version      0.3.1
 // @description  Bloß eine schwache Imitation des ursprünglichen BC+
 // @author       Frechdachs
 // @match        https://community.bisafans.de/chat/index.php?room/*
@@ -8,6 +8,13 @@
 // @grant        GM.setValue
 // @grant        GM.getValue
 // ==/UserScript==
+
+const userProfileLinkPrefix = "https://community.bisafans.de/index.php?user/"
+const userID = document.getElementsByClassName("userMenuItemLink")[0]
+    .getAttribute("href")
+    .substring(userProfileLinkPrefix.length)
+    .split("-")[0]
+
 
 const script = async function() {
     const chatUL = document.getElementsByClassName("scrollContainer")[0].childNodes[1];
@@ -20,23 +27,33 @@ const script = async function() {
     let highlightColor = await GM.getValue("bcplus_highlightColor", "#ffffaa");
     let settingsVisible = false;
     let settingsNode = undefined;
+    let checkedMessages = 0;
+
 
     const audio = new Audio("https://github.com/FrechdachsBB/BisaChatPlus/raw/main/bing.wav");
     const li = document.createElement("li");
 
     const analyzeChatMessages = (mutationList, observer) => {
         if (triggerList.length === 0) return;
-        const newNodes = Array.from(chatUL.getElementsByClassName("chatMessage htmlContent")).filter(n => !n.hasAttribute("bcp-observed"));
+        const newNodes = Array.from(chatUL.getElementsByClassName("chatMessage htmlContent"));
         const triggerListArr = triggerList.split(",")
 
-        for (let chatMessageNode of newNodes) {
-            const msg = chatMessageNode.innerText;
-            chatMessageNode.setAttribute("bcp-observed", true);
 
-            const foundTriggers = triggerListArr.filter(trigger => {
-                return msg.toLowerCase().match("(^| )"+trigger.trimStart()+"( |\\.|$)")!=null;
-            });
-            if (foundTriggers.length === 0) continue;
+        while (checkedMessages<newNodes.length) {
+            const chatMessageNode = newNodes[checkedMessages];
+            checkedMessages++;
+            const msg = chatMessageNode.innerText;
+
+            const chatMessageContainer = chatMessageNode.parentElement.parentElement.parentElement;
+            if(chatMessageContainer.getAttribute("data-user-id")==userID)continue;
+
+            //Filtern der Nachricht wird übersprungen, wenn es sich um eine Flüsternachricht handelt und es wird direkt zum Highlightpart gesprungen
+            if(chatMessageContainer.getAttribute("data-object-type")!=="be.bastelstu.chat.messageType.whisper") {
+                const foundTriggers = triggerListArr.filter(trigger => {
+                    return msg.toLowerCase().match("(^| )" + trigger.trimStart() + "( |\\.|$)") != null;
+                });
+                if (foundTriggers.length === 0) continue;
+            }
             chatMessageNode.style.background = highlightColor;
             if (playSound && document.hidden) audio.play();
         }
