@@ -2,12 +2,14 @@ const script = async function() {
     const chatUL = document.getElementsByClassName("scrollContainer")[0].childNodes[1];
     const observerConfig = {childList: true};
 
-    let triggerList = await GM.getValue("bcplus_trigger", "");
+
+
+    let triggerListUnescaped = await GM.getValue("bcplus_trigger", "");
+    let triggerList = escapeTriggerList();
     let playSound = await GM.getValue("bcplus_playSound", true);
     let highlightColor = await GM.getValue("bcplus_highlightColor", "#ffff00");
     let settingsVisible = false;
     let settingsNode = undefined;
-
 
     const audio = new Audio("https://github.com/FrechdachsBB/BisaChatPlus/raw/main/bing.wav");
     const li = document.createElement("li");
@@ -22,7 +24,7 @@ const script = async function() {
             chatMessageNode.setAttribute("bcp-observed", true);
 
             const foundTriggers = triggerListArr.filter(trigger => {
-                return msg.toLowerCase().match("(^| )"+trigger+"( |\\.|$)").length>0;
+                return msg.toLowerCase().match("(^| )"+trigger.trimStart()+"( |\\.|$)")!=null;
             });
             if (foundTriggers.length === 0) continue;
             chatMessageNode.style.background = highlightColor;
@@ -62,7 +64,7 @@ const script = async function() {
             settingsNode.style.margin = "5px";
 
             settingsNode.appendChild(createLabelNode("Trigger:"));
-            settingsNode.appendChild(createInputNode(triggerList,"text", callBackTrigger));
+            settingsNode.appendChild(createInputNode(triggerListUnescaped,"text", callBackTrigger));
             settingsNode.appendChild(createLabelNode("Highlight-Farbe:"));
             settingsNode.appendChild(createInputNode(highlightColor,"text", callBackHighlightColor));
             settingsNode.appendChild(createLabelNode("Sound:"));
@@ -88,7 +90,9 @@ const script = async function() {
     }
 
     function callBackTrigger(node) {
-        setTriggerList(node.value)
+        GM.setValue("bcplus_trigger", node.value);
+        triggerListUnescaped = node.value;
+        escapeTriggerList();
     }
 
     function callBackHighlightColor(node) {
@@ -122,10 +126,10 @@ const script = async function() {
         return input;
     }
 
-    function setTriggerList(triggers, update=true){
-        if(update)GM.setValue("bcplus_trigger", triggers);
-        triggerList = triggers.replace(/[#-.]|[[-^]|[?|{}]/g, '\\$&');
+    function escapeTriggerList(){
+       triggerList = triggerListUnescaped.replace(/[#-.]|[[-^]|[?|{}]/g, '\$&')
     }
+
 
     const observer = new MutationObserver(analyzeChatMessages);
     observer.observe(chatUL, observerConfig);
