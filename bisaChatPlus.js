@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         BC+ (DEV)
-// @version      0.1
+// @version      0.2
 // @description  Bloß eine schwache Imitation des ursprünglichen BC+
 // @author       Frechdachs
 // @match        https://community.bisafans.de/chat/index.php?room/*
@@ -12,10 +12,10 @@
 // ==/UserScript==
 
 const script = async function() {
+    console.log("Version 0.2!");
+
     const chatUL = document.getElementsByClassName("scrollContainer")[0].childNodes[1];
     const observerConfig = {childList: true};
-
-
 
     let triggerListUnescaped = await GM.getValue("bcplus_trigger", "");
     let triggerList = "";
