@@ -5,7 +5,8 @@ const script = async function() {
 
 
     let triggerListUnescaped = await GM.getValue("bcplus_trigger", "");
-    let triggerList = escapeTriggerList();
+    let triggerList = "";
+    escapeTriggerList();
     let playSound = await GM.getValue("bcplus_playSound", true);
     let highlightColor = await GM.getValue("bcplus_highlightColor", "#ffff00");
     let settingsVisible = false;
