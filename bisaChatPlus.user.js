@@ -1,8 +1,17 @@
+// ==UserScript==
+// @name         BC+
+// @version      0.2
+// @description  Bloß eine schwache Imitation des ursprünglichen BC+
+// @author       Frechdachs
+// @match        https://community.bisafans.de/chat/index.php?room/*
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=bisafans.de
+// @grant        GM.setValue
+// @grant        GM.getValue
+// ==/UserScript==
+
 const script = async function() {
     const chatUL = document.getElementsByClassName("scrollContainer")[0].childNodes[1];
     const observerConfig = {childList: true};
-
-
 
     let triggerListUnescaped = await GM.getValue("bcplus_trigger", "");
     let triggerList = "";
@@ -42,7 +51,7 @@ const script = async function() {
         const a = document.createElement("a");
 
         a.setAttribute("class", "button");
-        a.innerText = "BisaChat +";
+        a.innerText = "BC+";
         a.addEventListener('click', toggleSettingsDisplay)
         li.appendChild(a);
         navBar.appendChild(li);
