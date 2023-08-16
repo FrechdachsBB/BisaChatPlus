@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         BC+
-// @version      0.3.1
+// @version      0.3.2
 // @description  Bloß eine schwache Imitation des ursprünglichen BC+
 // @author       Frechdachs
 // @match        https://community.bisafans.de/chat/index.php?room/*
@@ -50,7 +50,7 @@ const script = async function() {
             //Filtern der Nachricht wird übersprungen, wenn es sich um eine Flüsternachricht handelt und es wird direkt zum Highlightpart gesprungen
             if(chatMessageContainer.getAttribute("data-object-type")!=="be.bastelstu.chat.messageType.whisper") {
                 const foundTriggers = triggerListArr.filter(trigger => {
-                    return msg.toLowerCase().match("(^| )" + trigger.trimStart() + "( |\\.|$)") != null;
+                    return msg.toLowerCase().match("((^| )" + trigger.trimStart() + "( |\\.|$))|(<"+trigger.trimStart()+">)") != null;
                 });
                 if (foundTriggers.length === 0) continue;
             }
