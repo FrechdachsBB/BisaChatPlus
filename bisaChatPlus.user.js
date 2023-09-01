@@ -157,53 +157,7 @@ const script = async function() {
     }
 
 
-    //TODO sorgt momentan noch für Absturz des Chats
-    function insertDummyChatMessage(username, message, whisper=false){
-        const chatMessageOuterContainer = document.createElement("li");
-        chatMessageOuterContainer.setAttribute("class","chatMessageBoundary first");
-        chatMessageOuterContainer.setAttribute("data-object-type", "be.bastelstu.chat.messageType."+(whisper?"whisper":"plain"));
 
-        const chatMessageInnerContainer = document.createElement("div");
-        chatMessageOuterContainer.appendChild(chatMessageInnerContainer);
-        chatMessageInnerContainer.setAttribute("class","chatMessageContainer");
-
-        const chatMessageSide = document.createElement("div");
-        chatMessageInnerContainer.appendChild(chatMessageSide);
-        chatMessageSide.setAttribute("class","chatMessageSide");
-
-        const chatUserAvatar = document.createElement("div");
-        chatMessageSide.appendChild(chatUserAvatar);
-        chatUserAvatar.setAttribute("class","chatUserAvatar");
-
-        const userAvatar = document.createElement("img");
-        chatUserAvatar.appendChild(userAvatar);
-        userAvatar.setAttribute("src","https://github.com/FrechdachsBB/BisaChatPlus/raw/dev/avatar.png");
-        userAvatar.setAttribute("height","32");
-        userAvatar.setAttribute("width","32");
-        userAvatar.setAttribute("loading","lazy");
-
-        const chatMessageContent =  document.createElement("div");
-        chatMessageInnerContainer.appendChild(chatMessageContent);
-        chatMessageContent.setAttribute("class","chatMessageContent");
-
-        const chatMessageHeader = document.createElement("chatMessageHeader");
-        chatMessageContent.appendChild(chatMessageHeader);
-        chatMessageHeader.setAttribute("class","chatMessageHeader");
-
-        const spanUsername = document.createElement("span");
-        chatMessageHeader.appendChild(spanUsername);
-        spanUsername.setAttribute("class","username");
-        spanUsername.innerText = username;
-
-        const chatMessage = document.createElement("div");
-        chatMessageContent.appendChild(chatMessage);
-        chatMessage.setAttribute("class", "chatMessage htmlContent");
-        chatMessage.innerText = message;
-
-        const messages = document.getElementsByClassName("chatMessageBoundary");
-        messages.item(messages.length-1).parentElement.appendChild(chatMessageOuterContainer);
-
-    }
 
 
     const observer = new MutationObserver(analyzeChatMessages);
