@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         BC+
-// @version      0.3.2
+// @version      0.3.3
 // @description  Bloß eine schwache Imitation des ursprünglichen BC+
 // @author       Frechdachs
 // @match        https://community.bisafans.de/chat/index.php?room/*
@@ -31,7 +31,7 @@ const script = async function() {
 
 
     const audio = new Audio("https://github.com/FrechdachsBB/BisaChatPlus/raw/main/bing.wav");
-    const li = document.createElement("li");
+    const navbarLi = document.createElement("li");
 
     const analyzeChatMessages = (mutationList, observer) => {
         if (triggerList.length === 0) return;
@@ -50,7 +50,7 @@ const script = async function() {
             //Filtern der Nachricht wird übersprungen, wenn es sich um eine Flüsternachricht handelt und es wird direkt zum Highlightpart gesprungen
             if(chatMessageContainer.getAttribute("data-object-type")!=="be.bastelstu.chat.messageType.whisper") {
                 const foundTriggers = triggerListArr.filter(trigger => {
-                    return msg.toLowerCase().match("((^| )" + trigger.trimStart() + "( |\\.|$))|(<"+trigger.trimStart()+">)") != null;
+                    return msg.toLowerCase().match("((^| |:|,|;)" + trigger.trimStart() + "( |\\.|$|,|:|;|!|\\?))|(<"+trigger.trimStart()+">)") != null;
                 });
                 if (foundTriggers.length === 0) continue;
             }
@@ -70,8 +70,8 @@ const script = async function() {
         a.setAttribute("class", "button");
         a.innerText = "BC+";
         a.addEventListener('click', toggleSettingsDisplay)
-        li.appendChild(a);
-        navBar.appendChild(li);
+        navbarLi.appendChild(a);
+        navBar.appendChild(navbarLi);
     }
 
     function toggleSettingsDisplay() {
@@ -99,7 +99,7 @@ const script = async function() {
             settingsNode.appendChild(checkbox);
             checkbox.checked = playSound;
 
-            li.appendChild(settingsNode);
+            navbarLi.appendChild(settingsNode);
         }
         settingsNode.style.display = "grid";
     }
@@ -141,8 +141,7 @@ const script = async function() {
         playSound = node.checked;
     }
 
-    function createInputNode(value = "", type = "text", callback = node => {
-    }) {
+    function createInputNode(value = "", type = "text", callback = node => {}){
         const input = document.createElement("input");
         input.setAttribute("type", type);
         input.value = value;
@@ -156,6 +155,9 @@ const script = async function() {
     function escapeTriggerList(){
        triggerList = triggerListUnescaped.replace(/[#-.]|[[-^]|[?|{}]/g, '\$&')
     }
+
+
+
 
 
     const observer = new MutationObserver(analyzeChatMessages);
