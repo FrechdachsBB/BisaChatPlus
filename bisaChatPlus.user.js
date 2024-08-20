@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         BC+
-// @version      0.3.3
+// @version      0.3.4
 // @description  Bloß eine schwache Imitation des ursprünglichen BC+
 // @author       Frechdachs
 // @match        https://community.bisafans.de/chat/index.php?room/*
@@ -10,15 +10,15 @@
 // ==/UserScript==
 
 const userProfileLinkPrefix = "https://community.bisafans.de/index.php?user/"
-const userID = document.getElementsByClassName("userMenuItemLink")[0]
+const ownUserID = document.getElementsByClassName("userMenuItemLink")[0]
     .getAttribute("href")
     .substring(userProfileLinkPrefix.length)
     .split("-")[0]
 
 
-const script = async function() {
+const script = async function () {
     const chatUL = document.getElementsByClassName("scrollContainer")[0].childNodes[1];
-    const observerConfig = {childList: true};
+    const observerConfig = { childList: true };
 
     let triggerListUnescaped = await GM.getValue("bcplus_trigger", "");
     let triggerList = "";
@@ -27,39 +27,42 @@ const script = async function() {
     let highlightColor = await GM.getValue("bcplus_highlightColor", "#ffffaa");
     let settingsVisible = false;
     let settingsNode = undefined;
-    let checkedMessages = 0;
-
 
     const audio = new Audio("https://github.com/FrechdachsBB/BisaChatPlus/raw/main/bing.wav");
     const navbarLi = document.createElement("li");
-
     const analyzeChatMessages = (mutationList, observer) => {
         if (triggerList.length === 0) return;
-        const newNodes = Array.from(chatUL.getElementsByClassName("chatMessage htmlContent"));
         const triggerListArr = triggerList.split(",")
 
+        for (let mutationRecord of mutationList) {
+            addedNodes = mutationRecord.addedNodes;
+            for (let node of addedNodes) {
+                const message = node.getElementsByClassName("chatMessage htmlContent")[0].innerText;
+                console.log(node);
+                let user = ""
 
-        while (checkedMessages<newNodes.length) {
-            const chatMessageNode = newNodes[checkedMessages];
-            checkedMessages++;
-            const msg = chatMessageNode.innerText;
+                let usernameNode = node.getElementsByClassName("username")[0].getElementsByClassName("jsUserActionDropdown")[0];
+                let userID = usernameNode.getAttribute("data-user-id");
+                if(userID === ownUserID)continue;
 
-            const chatMessageContainer = chatMessageNode.parentElement.parentElement.parentElement;
-            if(chatMessageContainer.getAttribute("data-user-id")==userID)continue;
+                for (let nameNode of usernameNode.childNodes) {
+                    if (nameNode.innerText) {
+                        user += nameNode.innerText;
+                    }
+                }
 
-            //Filtern der Nachricht wird übersprungen, wenn es sich um eine Flüsternachricht handelt und es wird direkt zum Highlightpart gesprungen
-            if(chatMessageContainer.getAttribute("data-object-type")!=="be.bastelstu.chat.messageType.whisper") {
-                const foundTriggers = triggerListArr.filter(trigger => {
-                    return msg.toLowerCase().match("((^| |:|,|;)" + trigger.trimStart() + "( |\\.|$|,|:|;|!|\\?))|(<"+trigger.trimStart()+">)") != null;
-                });
-                if (foundTriggers.length === 0) continue;
+                if (node.getAttribute("data-object-type") !== "be.bastelstu.chat.messageType.whisper") {
+                    const foundTriggers = triggerListArr.filter(trigger => {
+                        return message.toLowerCase().match("((^| |:|,|;)" + trigger.trimStart() + "( |\\.|$|,|:|;|!|\\?))|(<" + trigger.trimStart() + ">)") != null;
+                    });
+                    if (foundTriggers.length === 0) continue;
+                    node.style.background = highlightColor;
+                }
+                if (playSound && (document.hidden || !document.hasFocus())) audio.play();
             }
-            chatMessageNode.style.background = highlightColor;
-            if (playSound && document.hidden) audio.play();
         }
-
-
     }
+
 
     function insertNavigation() {
 
@@ -91,9 +94,9 @@ const script = async function() {
             settingsNode.style.margin = "5px";
 
             settingsNode.appendChild(createLabelNode("Trigger:"));
-            settingsNode.appendChild(createInputNode(triggerListUnescaped,"text", callBackTrigger));
+            settingsNode.appendChild(createInputNode(triggerListUnescaped, "text", callBackTrigger));
             settingsNode.appendChild(createLabelNode("Highlight-Farbe:"));
-            settingsNode.appendChild(createInputNode(highlightColor,"text", callBackHighlightColor));
+            settingsNode.appendChild(createInputNode(highlightColor, "text", callBackHighlightColor));
             settingsNode.appendChild(createLabelNode("Sound:"));
             let checkbox = createInputNode("", "checkbox", callBackPlaySound);
             settingsNode.appendChild(checkbox);
@@ -141,24 +144,20 @@ const script = async function() {
         playSound = node.checked;
     }
 
-    function createInputNode(value = "", type = "text", callback = node => {}){
+    function createInputNode(value = "", type = "text", callback = node => { }) {
         const input = document.createElement("input");
         input.setAttribute("type", type);
         input.value = value;
         input.addEventListener(
             'change',
-            ()=>callback(input)
+            () => callback(input)
         );
         return input;
     }
 
-    function escapeTriggerList(){
-       triggerList = triggerListUnescaped.replace(/[#-.]|[[-^]|[?|{}]/g, '\$&')
+    function escapeTriggerList() {
+        triggerList = triggerListUnescaped.replace(/[#-.]|[[-^]|[?|{}]/g, '\$&')
     }
-
-
-
-
 
     const observer = new MutationObserver(analyzeChatMessages);
     observer.observe(chatUL, observerConfig);
